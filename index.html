@@ -6,14 +6,31 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>smart-data-table</title>
+
   <link rel="stylesheet" href="./src/index.css" />
   <script type="module" src="/src/smart-data-table.ts"></script>
 </head>
 
 <body>
-  <smart-data-table>
-    <h1>Get started</h1>
-  </smart-data-table>
+  <smart-data-table id="table" pageSize=10></smart-data-table>
+
+  <script type="module">
+    const table = document.querySelector("#table");
+
+    const data = [
+      { id: 1, name: "Alice", age: 22, role: "Developer", country: "Romania" },
+      { id: 2, name: "Bob", age: 25, role: "Designer", country: "Germany" },
+      { id: 3, name: "Charlie", age: 30, role: "Manager", country: "UK" },
+      { id: 4, name: "David", age: 28, role: "Developer", country: "USA" },
+      { id: 5, name: "Eve", age: 26, role: "QA Engineer", country: "France" },
+      { id: 6, name: "Frank", age: 24, role: "DevOps", country: "Italy" },
+      { id: 7, name: "Grace", age: 27, role: "Product Owner", country: "Spain" }
+    ];
+
+    // IMPORTANT: assign Lit property like this
+    table.data = data;
+    table.title = "Employees";
+  </script>
 </body>
 
 </html>
