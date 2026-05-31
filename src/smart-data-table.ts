@@ -28,6 +28,10 @@ export class SmartDataTable extends LitElement {
   @property({ type: String, attribute: 'hidden-columns' })
   hiddenColumns: string = '';
 
+  // Export CSV button
+  @property({ type: Boolean, attribute: 'export-csv' })
+  exportCSV: boolean = false;
+
   // Columns
   @state()
   private columns: string[] = [];
@@ -251,18 +255,44 @@ export class SmartDataTable extends LitElement {
   }
 
   private _hiddenSet(): Set<string> {
-  return new Set(
-    this.hiddenColumns
-      .split(',')
-      .map(c => c.trim())
-      .filter(Boolean)
-  );
-}
+    return new Set(
+      this.hiddenColumns
+        .split(',')
+        .map((c) => c.trim())
+        .filter(Boolean),
+    );
+  }
 
-private _visibleColumns(): string[] {
-  const hidden = this._hiddenSet();
-  return this.columns.filter(col => !hidden.has(col));
-}
+  private _visibleColumns(): string[] {
+    const hidden = this._hiddenSet();
+    return this.columns.filter((col) => !hidden.has(col));
+  }
+
+  private _exportToCSV() {
+    const data = this._sortData([...this._filteredData()]);
+    const visibleCols = this._visibleColumns();
+
+    const escape = (val: any) => {
+      if (val == null) return '';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const header = visibleCols.join(',');
+    const rows = data.map((row) => visibleCols.map((col) => escape(row[col])).join(','));
+
+    const csv = [header, ...rows].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'table-export.csv';
+    a.click();
+
+    URL.revokeObjectURL(url);
+  }
 
   private _renderHeader() {
     return html`
@@ -309,6 +339,8 @@ private _visibleColumns(): string[] {
     return html`
       <div class="search-bubble">
         <input type="text" placeholder="Search..." .value=${this.search} @input=${this._onSearchChange} />
+
+        ${this.exportCSV ? html` <button class="export-btn" @click=${this._exportToCSV}>Export CSV</button> ` : null}
       </div>
     `;
   }

@@ -215,11 +215,11 @@ export const styles = css`
     box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
 
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex;
   }
 
   .search-bubble input {
-    width: 220px;
+    width: 200px;
     padding: 8px 12px;
     border-radius: 999px;
     border: 1px solid #e2e8f0;
@@ -234,5 +234,19 @@ export const styles = css`
   .search-bubble input:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
+  .export-btn {
+    padding: 7px 12px;
+    border-radius: 999px;
+    border: 1px solid #cbd5e1;
+    background: #2563eb;
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+
+  .export-btn:hover {
+    background: #1d4ed8;
   }
 `;
