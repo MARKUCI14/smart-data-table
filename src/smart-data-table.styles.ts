@@ -6,6 +6,7 @@ export const styles = css`
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
       Arial, sans-serif;
     color: #0f172a;
+    padding: 5px;
   }
 
   .wrapper {
@@ -146,5 +147,42 @@ export const styles = css`
 
   .close:hover {
     opacity: 1;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    color: #334155;
+    border-radius: 12px;
+    margin-top: 5px;
+  }
+
+  .pagination button {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+
+  .pagination button:hover:not(:disabled) {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #0f172a;
+  }
+
+  .pagination button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #64748b;
   }
 `;

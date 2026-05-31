@@ -12,9 +12,9 @@
 </head>
 
 <body>
-  <smart-data-table id="table" pageSize=10></smart-data-table>
-  <smart-data-table id="table2" pageSize=5></smart-data-table>
-  <smart-data-table api="https://jsonplaceholder.typicode.com/users"></smart-data-table>
+  <smart-data-table id="table"></smart-data-table>
+  <smart-data-table id="table2" page-size="2"></smart-data-table>
+  <smart-data-table api="https://jsonplaceholder.typicode.com/users" page-size="5"></smart-data-table>
 
   <script type="module">
     const table = document.querySelector("#table");

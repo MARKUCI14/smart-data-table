@@ -4,20 +4,33 @@ import { styles } from "./smart-data-table.styles";
 
 @customElement("smart-data-table")
 export class SmartDataTable extends LitElement {
+  // Data to display
   @property({ type: Array })
   data: Record<string, any>[] = [];
 
+  // API endpoint
   @property({ type: String })
   api?: string;
 
+  // Page size (Pagination)
+  @property({ type: Number, attribute: "page-size" })
+  pageSize: number = 10;
+
+  // Columns
   @state()
   private columns: string[] = [];
 
+  // For Object modal
   @state()
   private selectedObject: any = null;
 
+  // For Object modal status
   @state()
   private modalOpen: boolean = false;
+
+  // Current Page
+  @state()
+  private currentPage: number = 1;
 
   static readonly styles = styles;
 
@@ -34,10 +47,12 @@ export class SmartDataTable extends LitElement {
   updated(changedProps: Map<string, any>) {
     if (changedProps.has("data")) {
       this._extractColumns();
+      this.currentPage = 1; // Reset to first page when data changes
     }
 
     if (changedProps.has("api") && this.api) {
       this._fetchData();
+      this.currentPage = 1; // Reset to first page when API changes
     }
   }
 
@@ -109,6 +124,28 @@ export class SmartDataTable extends LitElement {
     this.selectedObject = null;
   }
 
+  private _paginatedData() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    return this.data.slice(start, end);
+  }
+
+  private _totalPages() {
+    return Math.max(1, Math.ceil(this.data.length / this.pageSize));
+  }
+
+  private _nextPage() {
+    if (this.currentPage < this._totalPages()) {
+      this.currentPage++;
+    }
+  }
+
+  private _prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
+  }
+
   private _renderHeader() {
     return html`
       <thead>
@@ -124,7 +161,7 @@ export class SmartDataTable extends LitElement {
   private _renderRows() {
     return html`
       <tbody>
-        ${this.data.map(
+        ${this._paginatedData().map(
           (row) => html`
             <tr>
               ${this.columns.map(
@@ -160,6 +197,30 @@ ${JSON.stringify(this.selectedObject, null, 2)}
     `;
   }
 
+  private _renderPagination() {
+    const total = this._totalPages();
+
+    if (total <= 1) {
+      return null;
+    }
+
+    return html`
+      <div class="pagination">
+        <button @click=${this._prevPage} ?disabled=${this.currentPage === 1}>
+          Prev
+        </button>
+
+        <span>
+          Page ${this.currentPage} / ${total}
+        </span>
+
+        <button @click=${this._nextPage} ?disabled=${this.currentPage === total}>
+          Next
+        </button>
+      </div>
+    `;
+  }
+
   render() {
     if (!this.data || this.data.length === 0) {
       return html`<div class="empty">No data available</div>`;
@@ -174,6 +235,7 @@ ${JSON.stringify(this.selectedObject, null, 2)}
       </div>
 
       ${this._renderModal()}
+      ${this._renderPagination()}
     `;
   }
 }
