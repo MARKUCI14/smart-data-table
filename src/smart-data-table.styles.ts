@@ -190,4 +190,13 @@ export const styles = css`
     border-color: #e2e8f0;
     color: #64748b;
   }
+
+  th {
+    user-select: none;
+    z-index: -1;
+  }
+
+  th:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 `;

@@ -16,6 +16,10 @@ export class SmartDataTable extends LitElement {
   @property({ type: Number, attribute: 'page-size' })
   pageSize: number = 10;
 
+  // Sortable columns
+  @property({ type: String, attribute: 'sortable' })
+  sortableColumns: string = '';
+
   // Columns
   @state()
   private columns: string[] = [];
@@ -31,6 +35,12 @@ export class SmartDataTable extends LitElement {
   // Current Page
   @state()
   private currentPage: number = 1;
+
+  @state()
+  private sortColumn: string | null = null;
+
+  @state()
+  private sortDirection: 'none' | 'asc' | 'desc' = 'none';
 
   static readonly styles = styles;
 
@@ -117,10 +127,13 @@ export class SmartDataTable extends LitElement {
     this.selectedObject = null;
   }
 
-  private _paginatedData() {
+  private get _processedData() {
+    const sorted = this._sortData([...this.data]);
+
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
-    return this.data.slice(start, end);
+
+    return sorted.slice(start, end);
   }
 
   private _totalPages() {
@@ -139,20 +152,104 @@ export class SmartDataTable extends LitElement {
     }
   }
 
-  private _renderHeader() {
-    return html`
-      <thead>
-        <tr>
-          ${this.columns.map((col) => html`<th>${col}</th>`)}
-        </tr>
-      </thead>
-    `;
+  private _isSortable(column: string) {
+    if (!this.sortableColumns) return false;
+
+    return this.sortableColumns
+      .split(',')
+      .map((c) => c.trim())
+      .includes(column);
   }
+
+  private _sortData(data: Record<string, any>[]) {
+  const sorted = [...data];
+
+  if (!this.sortColumn || this.sortDirection === 'none') {
+    return sorted;
+  }
+
+  sorted.sort((a, b) => {
+    const valA = a[this.sortColumn!];
+    const valB = b[this.sortColumn!];
+
+    if (valA == null && valB == null) return 0;
+    if (valA == null) return 1;
+    if (valB == null) return -1;
+
+    const numA = Number(valA);
+    const numB = Number(valB);
+
+    const bothNumeric = !Number.isNaN(numA) && !Number.isNaN(numB);
+
+    if (bothNumeric) {
+      return numA - numB;
+    }
+
+    return String(valA).localeCompare(String(valB));
+  });
+
+  if (this.sortDirection === 'desc') {
+    sorted.reverse();
+  }
+
+  return sorted;
+}
+
+  private _toggleSort(column: string) {
+    if (!this._isSortable(column)) return;
+
+    if (this.sortColumn !== column) {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    } else {
+      if (this.sortDirection === 'asc') {
+        this.sortDirection = 'desc';
+      } else if (this.sortDirection === 'desc') {
+        this.sortDirection = 'none';
+        this.sortColumn = null;
+      } else {
+        this.sortDirection = 'asc';
+      }
+    }
+
+    this.currentPage = 1;
+    this.requestUpdate();
+  }
+
+  private _renderHeader() {
+  return html`
+    <thead>
+      <tr>
+        ${this.columns.map((col) => {
+          const sortable = this._isSortable(col);
+
+          const indicator =
+            this.sortColumn === col
+              ? this.sortDirection === 'asc'
+                ? ' ▲'
+                : this.sortDirection === 'desc'
+                  ? ' ▼'
+                  : ''
+              : '';
+
+          return html`
+            <th
+              @click=${() => this._toggleSort(col)}
+              style=${sortable ? 'cursor: pointer;' : 'cursor: default;'}
+            >
+              ${col}${sortable ? indicator : ''}
+            </th>
+          `;
+        })}
+      </tr>
+    </thead>
+  `;
+}
 
   private _renderRows() {
     return html`
       <tbody>
-        ${this._paginatedData().map(
+        ${this._processedData.map(
           (row) => html`
             <tr>
               ${this.columns.map((col) => html` <td>${this._renderCell(row[col])}</td> `)}
