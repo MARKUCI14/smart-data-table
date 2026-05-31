@@ -20,6 +20,10 @@ export class SmartDataTable extends LitElement {
   @property({ type: String, attribute: 'sortable' })
   sortableColumns: string = '';
 
+  // Show search input
+  @property({ type: Boolean, attribute: 'show-search' })
+  showSearch: boolean = false;
+
   // Columns
   @state()
   private columns: string[] = [];
@@ -41,6 +45,9 @@ export class SmartDataTable extends LitElement {
 
   @state()
   private sortDirection: 'none' | 'asc' | 'desc' = 'none';
+
+  @state()
+  private search: string = '';
 
   static readonly styles = styles;
 
@@ -128,7 +135,7 @@ export class SmartDataTable extends LitElement {
   }
 
   private get _processedData() {
-    const sorted = this._sortData([...this.data]);
+    const sorted = this._sortData([...this._filteredData()]);
 
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
@@ -137,7 +144,9 @@ export class SmartDataTable extends LitElement {
   }
 
   private _totalPages() {
-    return Math.max(1, Math.ceil(this.data.length / this.pageSize));
+    const totalItems = this._filteredData().length;
+    const size = this.pageSize > 0 ? this.pageSize : 1;
+    return Math.max(1, Math.ceil(totalItems / size));
   }
 
   private _nextPage() {
@@ -162,38 +171,38 @@ export class SmartDataTable extends LitElement {
   }
 
   private _sortData(data: Record<string, any>[]) {
-  const sorted = [...data];
+    const sorted = [...data];
 
-  if (!this.sortColumn || this.sortDirection === 'none') {
-    return sorted;
-  }
-
-  sorted.sort((a, b) => {
-    const valA = a[this.sortColumn!];
-    const valB = b[this.sortColumn!];
-
-    if (valA == null && valB == null) return 0;
-    if (valA == null) return 1;
-    if (valB == null) return -1;
-
-    const numA = Number(valA);
-    const numB = Number(valB);
-
-    const bothNumeric = !Number.isNaN(numA) && !Number.isNaN(numB);
-
-    if (bothNumeric) {
-      return numA - numB;
+    if (!this.sortColumn || this.sortDirection === 'none') {
+      return sorted;
     }
 
-    return String(valA).localeCompare(String(valB));
-  });
+    sorted.sort((a, b) => {
+      const valA = a[this.sortColumn!];
+      const valB = b[this.sortColumn!];
 
-  if (this.sortDirection === 'desc') {
-    sorted.reverse();
+      if (valA == null && valB == null) return 0;
+      if (valA == null) return 1;
+      if (valB == null) return -1;
+
+      const numA = Number(valA);
+      const numB = Number(valB);
+
+      const bothNumeric = !Number.isNaN(numA) && !Number.isNaN(numB);
+
+      if (bothNumeric) {
+        return numA - numB;
+      }
+
+      return String(valA).localeCompare(String(valB));
+    });
+
+    if (this.sortDirection === 'desc') {
+      sorted.reverse();
+    }
+
+    return sorted;
   }
-
-  return sorted;
-}
 
   private _toggleSort(column: string) {
     if (!this._isSortable(column)) return;
@@ -216,35 +225,53 @@ export class SmartDataTable extends LitElement {
     this.requestUpdate();
   }
 
+  private _filteredData() {
+    const q = this.search.trim().toLowerCase();
+
+    if (!q) {
+      return this.data;
+    }
+
+    return this.data.filter((row) => {
+      return Object.values(row).some((val) => {
+        if (val == null) return false;
+        return String(val).toLowerCase().includes(q);
+      });
+    });
+  }
+
+  private _onSearchChange(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.search = input.value;
+    this.currentPage = 1;
+  }
+
   private _renderHeader() {
-  return html`
-    <thead>
-      <tr>
-        ${this.columns.map((col) => {
-          const sortable = this._isSortable(col);
+    return html`
+      <thead>
+        <tr>
+          ${this.columns.map((col) => {
+            const sortable = this._isSortable(col);
 
-          const indicator =
-            this.sortColumn === col
-              ? this.sortDirection === 'asc'
-                ? ' ▲'
-                : this.sortDirection === 'desc'
-                  ? ' ▼'
-                  : ''
-              : '';
+            const indicator =
+              this.sortColumn === col
+                ? this.sortDirection === 'asc'
+                  ? ' ▲'
+                  : this.sortDirection === 'desc'
+                    ? ' ▼'
+                    : ''
+                : '';
 
-          return html`
-            <th
-              @click=${() => this._toggleSort(col)}
-              style=${sortable ? 'cursor: pointer;' : 'cursor: default;'}
-            >
-              ${col}${sortable ? indicator : ''}
-            </th>
-          `;
-        })}
-      </tr>
-    </thead>
-  `;
-}
+            return html`
+              <th @click=${() => this._toggleSort(col)} style=${sortable ? 'cursor: pointer;' : 'cursor: default;'}>
+                ${col}${sortable ? indicator : ''}
+              </th>
+            `;
+          })}
+        </tr>
+      </thead>
+    `;
+  }
 
   private _renderRows() {
     return html`
@@ -257,6 +284,14 @@ export class SmartDataTable extends LitElement {
           `,
         )}
       </tbody>
+    `;
+  }
+
+  private _renderSearch() {
+    return html`
+      <div class="search-bubble">
+        <input type="text" placeholder="Search..." .value=${this.search} @input=${this._onSearchChange} />
+      </div>
     `;
   }
 
@@ -304,13 +339,17 @@ ${JSON.stringify(this.selectedObject, null, 2)}
     }
 
     return html`
-      <div class="wrapper">
-        <table>
-          ${this._renderHeader()} ${this._renderRows()}
-        </table>
-      </div>
+      <div class="table-shell">
+        ${this.showSearch ? this._renderSearch() : null}
 
-      ${this._renderModal()} ${this._renderPagination()}
+        <div class="wrapper">
+          <table>
+            ${this._renderHeader()} ${this._renderRows()}
+          </table>
+        </div>
+
+        ${this._renderModal()} ${this._renderPagination()}
+      </div>
     `;
   }
 }

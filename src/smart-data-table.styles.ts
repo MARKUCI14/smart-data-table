@@ -199,4 +199,40 @@ export const styles = css`
   th:hover {
     background: rgba(255, 255, 255, 0.1);
   }
+
+  .table-shell {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .search-bubble {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .search-bubble input {
+    width: 220px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    outline: none;
+    font-size: 13px;
+    transition: all 0.15s ease;
+    background: white;
+    color: #0f172a;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  }
+
+  .search-bubble input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+  }
 `;
