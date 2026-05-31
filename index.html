@@ -13,6 +13,8 @@
 
 <body>
   <smart-data-table id="table" pageSize=10></smart-data-table>
+  <smart-data-table id="table2" pageSize=5></smart-data-table>
+  <smart-data-table api="https://jsonplaceholder.typicode.com/users"></smart-data-table>
 
   <script type="module">
     const table = document.querySelector("#table");
@@ -27,9 +29,20 @@
       { id: 7, name: "Grace", age: 27, role: "Product Owner", country: "Spain" }
     ];
 
-    // IMPORTANT: assign Lit property like this
+    const table2 = document.querySelector("#table2");
+
+    const data2 = [
+      { id: 1, name: "Lionel Messi", age: 34, team: "Paris Saint-Germain", position: "Forward" },
+      { id: 2, name: "Cristiano Ronaldo", age: 36, team: "Manchester United", position: "Forward" },
+      { id: 3, name: "Neymar Jr.", age: 29, team: "Paris Saint-Germain", position: "Forward" },
+      { id: 4, name: "Kylian Mbappé", age: 22, team: "Paris Saint-Germain", position: "Forward" },
+      { id: 5, name: "Kevin De Bruyne", age: 30, team: "Manchester City", position: "Midfielder" }
+    ];
+
     table.data = data;
     table.title = "Employees";
+    table2.data = data2;
+    table2.title = "Players";
   </script>
 </body>
 
