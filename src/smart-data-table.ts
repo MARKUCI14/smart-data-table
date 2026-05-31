@@ -1,8 +1,8 @@
-import { LitElement, html } from "lit";
-import { customElement, property, state } from "lit/decorators.js";
-import { styles } from "./smart-data-table.styles";
+import { LitElement, html } from 'lit';
+import { customElement, property, state } from 'lit/decorators.js';
+import { styles } from './smart-data-table.styles';
 
-@customElement("smart-data-table")
+@customElement('smart-data-table')
 export class SmartDataTable extends LitElement {
   // Data to display
   @property({ type: Array })
@@ -13,7 +13,7 @@ export class SmartDataTable extends LitElement {
   api?: string;
 
   // Page size (Pagination)
-  @property({ type: Number, attribute: "page-size" })
+  @property({ type: Number, attribute: 'page-size' })
   pageSize: number = 10;
 
   // Columns
@@ -36,28 +36,28 @@ export class SmartDataTable extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener("keydown", this._handleKeyDown);
+    document.addEventListener('keydown', this._handleKeyDown);
   }
 
   disconnectedCallback() {
-    document.removeEventListener("keydown", this._handleKeyDown);
+    document.removeEventListener('keydown', this._handleKeyDown);
     super.disconnectedCallback();
   }
 
   updated(changedProps: Map<string, any>) {
-    if (changedProps.has("data")) {
+    if (changedProps.has('data')) {
       this._extractColumns();
       this.currentPage = 1; // Reset to first page when data changes
     }
 
-    if (changedProps.has("api") && this.api) {
+    if (changedProps.has('api') && this.api) {
       this._fetchData();
       this.currentPage = 1; // Reset to first page when API changes
     }
   }
 
   private readonly _handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       this._closeModal();
     }
   };
@@ -76,7 +76,7 @@ export class SmartDataTable extends LitElement {
 
       this.data = Array.isArray(jsonData) ? jsonData : [];
     } catch (error) {
-      console.error("Error fetching API data:", error);
+      console.error('Error fetching API data:', error);
       this.data = [];
     }
   }
@@ -96,22 +96,15 @@ export class SmartDataTable extends LitElement {
   }
 
   private _isObject(value: any) {
-    return value !== null && typeof value === "object";
+    return value !== null && typeof value === 'object';
   }
 
   private _renderCell(value: any) {
     if (this._isObject(value)) {
-      return html`
-        <button
-          class="obj-btn"
-          @click=${() => this._openModal(value)}
-        >
-          View object
-        </button>
-      `;
+      return html` <button class="obj-btn" @click=${() => this._openModal(value)}>View object</button> `;
     }
 
-    return html`${value ?? ""}`;
+    return html`${value ?? ''}`;
   }
 
   private _openModal(obj: any) {
@@ -150,9 +143,7 @@ export class SmartDataTable extends LitElement {
     return html`
       <thead>
         <tr>
-          ${this.columns.map(
-            (col) => html`<th>${col}</th>`
-          )}
+          ${this.columns.map((col) => html`<th>${col}</th>`)}
         </tr>
       </thead>
     `;
@@ -164,15 +155,9 @@ export class SmartDataTable extends LitElement {
         ${this._paginatedData().map(
           (row) => html`
             <tr>
-              ${this.columns.map(
-                (col) => html`
-                  <td>
-                    ${this._renderCell(row[col])}
-                  </td>
-                `
-              )}
+              ${this.columns.map((col) => html` <td>${this._renderCell(row[col])}</td> `)}
             </tr>
-          `
+          `,
         )}
       </tbody>
     `;
@@ -191,7 +176,8 @@ export class SmartDataTable extends LitElement {
 
           <pre class="modal-body">
 ${JSON.stringify(this.selectedObject, null, 2)}
-          </pre>
+          </pre
+          >
         </div>
       </div>
     `;
@@ -206,17 +192,11 @@ ${JSON.stringify(this.selectedObject, null, 2)}
 
     return html`
       <div class="pagination">
-        <button @click=${this._prevPage} ?disabled=${this.currentPage === 1}>
-          Prev
-        </button>
+        <button @click=${this._prevPage} ?disabled=${this.currentPage === 1}>Prev</button>
 
-        <span>
-          Page ${this.currentPage} / ${total}
-        </span>
+        <span> Page ${this.currentPage} / ${total} </span>
 
-        <button @click=${this._nextPage} ?disabled=${this.currentPage === total}>
-          Next
-        </button>
+        <button @click=${this._nextPage} ?disabled=${this.currentPage === total}>Next</button>
       </div>
     `;
   }
@@ -229,13 +209,11 @@ ${JSON.stringify(this.selectedObject, null, 2)}
     return html`
       <div class="wrapper">
         <table>
-          ${this._renderHeader()}
-          ${this._renderRows()}
+          ${this._renderHeader()} ${this._renderRows()}
         </table>
       </div>
 
-      ${this._renderModal()}
-      ${this._renderPagination()}
+      ${this._renderModal()} ${this._renderPagination()}
     `;
   }
 }

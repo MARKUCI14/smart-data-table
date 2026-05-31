@@ -1,10 +1,16 @@
-import { css } from "lit";
+import { css } from 'lit';
 
 export const styles = css`
   :host {
     display: block;
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-      Arial, sans-serif;
+    font-family:
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      Roboto,
+      Arial,
+      sans-serif;
     color: #0f172a;
     padding: 5px;
   }
@@ -132,8 +138,7 @@ export const styles = css`
     max-height: 60vh;
     background: #0b1220;
     color: #e5e7eb;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-      "Liberation Mono", monospace;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
   }
 
   .close {
