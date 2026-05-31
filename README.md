@@ -455,5 +455,3 @@ Please open an issue before submitting a pull request for significant changes. A
 ## License
 
 MIT © Portik Márk-Krisztián
-
-MIT © Portik Márk-Krisztián
