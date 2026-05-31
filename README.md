@@ -4,6 +4,26 @@ A lightweight, framework-agnostic **data table Web Component** built with [Lit](
 
 ---
 
+## Table of Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Usage](#usage)
+- [Attributes](#attributes)
+- [JavaScript API](#javascript-api)
+- [Events](#events)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Features in Detail](#features-in-detail)
+- [Framework Usage](#framework-usage)
+- [Architecture](#architecture)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
+- [License](#license)
+
+---
+
 ## Features
 
 - Render data from a static JSON array or a remote API endpoint
@@ -19,10 +39,53 @@ A lightweight, framework-agnostic **data table Web Component** built with [Lit](
 
 ---
 
+## Requirements
+
+- A browser with [Web Components support](https://caniuse.com/custom-elementsv1) (all modern browsers)
+- Node.js **≥ 16** (for local development or bundling)
+- If loading via `<script type="module">` directly in the browser, no bundler is required
+
+---
+
 ## Installation
+
+### npm
 
 ```bash
 npm install smart-data-table
+```
+
+### CDN (no bundler required)
+
+```html
+<script type="module" src="https://unpkg.com/smart-data-table/dist/smart-data-table.js"></script>
+```
+
+---
+
+## Quick Start
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>smart-data-table demo</title>
+  </head>
+  <body>
+    <smart-data-table id="table" show-search export-csv page-size="5"></smart-data-table>
+
+    <script type="module">
+      import 'smart-data-table';
+
+      document.querySelector('#table').data = [
+        { id: 1, name: 'Alice', age: 22, role: 'Developer' },
+        { id: 2, name: 'Bob', age: 25, role: 'Designer' },
+        { id: 3, name: 'Carol', age: 30, role: 'Manager' },
+      ];
+    </script>
+  </body>
+</html>
 ```
 
 ---
@@ -61,17 +124,20 @@ npm install smart-data-table
 <smart-data-table api="https://jsonplaceholder.typicode.com/users"></smart-data-table>
 ```
 
+The component sends a `GET` request to the provided URL and expects a JSON response of type `Record<string, any>[]`. Columns are automatically extracted from the first object in the returned array.
+
 ---
 
 ## Attributes
 
-| Attribute        | Type    | Default | Description                              |
-| ---------------- | ------- | ------- | ---------------------------------------- |
-| `page-size`      | Number  | `10`    | Number of rows per page                  |
-| `sortable`       | String  | `""`    | Comma-separated list of sortable columns |
-| `show-search`    | Boolean | `false` | Enables the global search input          |
-| `hidden-columns` | String  | `""`    | Comma-separated list of columns to hide  |
-| `export-csv`     | Boolean | `false` | Enables the CSV export button            |
+| Attribute        | Type    | Default | Description                                      |
+| ---------------- | ------- | ------- | ------------------------------------------------ |
+| `page-size`      | Number  | `10`    | Number of rows per page                          |
+| `sortable`       | String  | `""`    | Comma-separated list of sortable columns         |
+| `show-search`    | Boolean | `false` | Enables the global search input                  |
+| `hidden-columns` | String  | `""`    | Comma-separated list of columns to hide          |
+| `export-csv`     | Boolean | `false` | Enables the CSV export button                    |
+| `api`            | String  | `""`    | URL of a remote JSON endpoint to fetch data from |
 
 ### Attribute examples
 
@@ -115,19 +181,67 @@ npm install smart-data-table
 
 ## JavaScript API
 
-| Property          | Type                    | Description                      |
-| ----------------- | ----------------------- | -------------------------------- |
-| `data`            | `Record<string, any>[]` | Input dataset                    |
-| `api`             | `string`                | Fetch data from an API endpoint  |
-| `pageSize`        | `number`                | Pagination size                  |
-| `sortableColumns` | `string`                | Comma-separated sortable columns |
-| `hiddenColumns`   | `string`                | Comma-separated hidden columns   |
-| `exportCSV`       | `boolean`               | Enables CSV export               |
-| `showSearch`      | `boolean`               | Enables search UI                |
+### Properties
+
+| Property          | Type                    | Description                          |
+| ----------------- | ----------------------- | ------------------------------------ |
+| `data`            | `Record<string, any>[]` | Input dataset (set programmatically) |
+| `api`             | `string`                | Fetch data from an API endpoint      |
+| `pageSize`        | `number`                | Pagination size                      |
+| `sortableColumns` | `string`                | Comma-separated sortable columns     |
+| `hiddenColumns`   | `string`                | Comma-separated hidden columns       |
+| `exportCSV`       | `boolean`               | Enables CSV export                   |
+| `showSearch`      | `boolean`               | Enables search UI                    |
+
+### Setting data programmatically
+
+```js
+const table = document.querySelector('smart-data-table');
+
+// Replace the entire dataset
+table.data = newArray;
+
+// Update options at runtime
+table.pageSize = 20;
+table.hiddenColumns = 'id,createdAt';
+```
+
+### Listening to events
+
+```js
+const table = document.querySelector('smart-data-table');
+
+table.addEventListener('row-click', (e) => {
+  console.log('Clicked row data:', e.detail);
+});
+
+table.addEventListener('sort-change', (e) => {
+  console.log('Sort state:', e.detail); // { column: 'age', direction: 'asc' }
+});
+```
 
 ---
 
-## Features in detail
+## Events
+
+| Event           | Fired when           | `e.detail` shape                                         |
+| --------------- | -------------------- | -------------------------------------------------------- |
+| `row-click`     | A row is clicked     | The full row object                                      |
+| `sort-change`   | Sorting changes      | `{ column: string, direction: 'asc' \| 'desc' \| null }` |
+| `page-change`   | Page changes         | `{ page: number, pageSize: number }`                     |
+| `search-change` | Search input updates | `{ query: string }`                                      |
+
+---
+
+## Keyboard Shortcuts
+
+| Key      | Action                           |
+| -------- | -------------------------------- |
+| `Escape` | Close the object inspector modal |
+
+---
+
+## Features in Detail
 
 ### Sorting
 
@@ -137,19 +251,27 @@ Click a column header to cycle through sort states:
 2. Second click → descending
 3. Third click → reset (unsorted)
 
-Only columns listed in `sortable` are clickable.
+Only columns listed in the `sortable` attribute are clickable. Columns not listed render as plain, non-interactive headers.
 
 ### Search
 
-Filters across all visible columns. For example, entering `"john"` matches any row where any visible cell contains that string.
+Filters across all visible columns. For example, entering `"john"` matches any row where any visible cell contains that string (case-insensitive). Hidden columns (via `hidden-columns`) are excluded from the search.
+
+### Pagination
+
+Rows are split into pages of `page-size` rows each. Navigation controls are rendered below the table. Pagination resets to page 1 whenever the search query or sort order changes.
 
 ### Column visibility
 
-Columns listed in `hidden-columns` are fully removed from the header, all rows, and CSV export.
+Columns listed in `hidden-columns` are fully removed from the header, all rows, and CSV export. To toggle visibility at runtime, update the `hiddenColumns` property:
+
+```js
+table.hiddenColumns = 'email,phone';
+```
 
 ### CSV export
 
-Exports the currently filtered and sorted dataset. Example output:
+Exports the currently filtered and sorted dataset. Only visible columns are included. Example output:
 
 ```
 name,age,role
@@ -157,28 +279,20 @@ Alice,22,Developer
 Bob,25,Designer
 ```
 
----
+### Object inspector modal
 
-## Events
-
-| Event           | Fired when           |
-| --------------- | -------------------- |
-| `row-click`     | A row is clicked     |
-| `sort-change`   | Sorting changes      |
-| `page-change`   | Page changes         |
-| `search-change` | Search input updates |
+When a cell contains a nested object or array, clicking it opens a modal with a formatted JSON view of the value. Press `Escape` or click outside the modal to close it.
 
 ---
 
-## Keyboard shortcuts
+## Framework Usage
 
-| Key      | Action                           |
-| -------- | -------------------------------- |
-| `Escape` | Close the object inspector modal |
+### Vanilla JS / HTML
 
----
-
-## Framework usage
+```html
+<smart-data-table show-search sortable="age,role" page-size="5"></smart-data-table>
+<script type="module" src="node_modules/smart-data-table/dist/smart-data-table.js"></script>
+```
 
 ### React
 
@@ -190,15 +304,39 @@ export default function App() {
 }
 ```
 
+> **Note:** To pass `data` as an array from React, use a `ref`:
+>
+> ```jsx
+> import { useEffect, useRef } from 'react';
+> import 'smart-data-table';
+>
+> export default function App() {
+>   const ref = useRef(null);
+>
+>   useEffect(() => {
+>     ref.current.data = [{ id: 1, name: 'Alice', age: 22 }];
+>   }, []);
+>
+>   return <smart-data-table ref={ref} show-search />;
+> }
+> ```
+
 ### Vue
 
 ```vue
 <script setup>
 import 'smart-data-table';
+import { ref, onMounted } from 'vue';
+
+const tableRef = ref(null);
+
+onMounted(() => {
+  tableRef.value.data = [{ id: 1, name: 'Alice', age: 22 }];
+});
 </script>
 
 <template>
-  <smart-data-table show-search sortable="age,role" />
+  <smart-data-table ref="tableRef" show-search sortable="age,role" />
 </template>
 ```
 
@@ -218,6 +356,20 @@ export class AppModule {}
 ```html
 <!-- template -->
 <smart-data-table show-search sortable="age,role"></smart-data-table>
+```
+
+```ts
+// component.ts — passing data via ViewChild
+import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+
+@Component({ selector: 'app-root', templateUrl: './app.component.html' })
+export class AppComponent implements AfterViewInit {
+  @ViewChild('table') tableRef!: ElementRef;
+
+  ngAfterViewInit() {
+    this.tableRef.nativeElement.data = [{ id: 1, name: 'Alice', age: 22 }];
+  }
+}
 ```
 
 ---
@@ -245,6 +397,63 @@ UI rendering (table + toolbar + modal)
 - Reactive rendering via Lit
 - Drop-in usage with no required dependencies
 
+### Project structure
+
+```
+smart-data-table/
+├── src/
+│   ├── index.css
+│   ├── smart-data-table.styles.ts
+│   └── smart-data-table.ts
+├── dist/
+│   └── smart-data-table.js
+├── package.json
+└── README.md
+```
+
+---
+
+## Contributing
+
+Contributions are welcome! To get started:
+
+1. Fork the repository and clone it locally.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
+4. Run tests:
+   ```bash
+   npm test
+   ```
+5. Build for production:
+   ```bash
+   npm run build
+   ```
+
+Please open an issue before submitting a pull request for significant changes. All pull requests should include relevant tests and an update to this documentation if applicable.
+
+---
+
+## Changelog
+
+### v1.0.0
+
+- Initial release
+- Static data and API endpoint support
+- Sorting, pagination, search, hidden columns, CSV export
+- Object inspector modal
+- Event system: `row-click`, `sort-change`, `page-change`, `search-change`
+- Framework guides for React, Vue, and Angular
+
+---
+
 ## License
+
+MIT © Portik Márk-Krisztián
 
 MIT © Portik Márk-Krisztián
