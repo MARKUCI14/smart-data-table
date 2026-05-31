@@ -24,6 +24,10 @@ export class SmartDataTable extends LitElement {
   @property({ type: Boolean, attribute: 'show-search' })
   showSearch: boolean = false;
 
+  // Hidden columns
+  @property({ type: String, attribute: 'hidden-columns' })
+  hiddenColumns: string = '';
+
   // Columns
   @state()
   private columns: string[] = [];
@@ -246,11 +250,25 @@ export class SmartDataTable extends LitElement {
     this.currentPage = 1;
   }
 
+  private _hiddenSet(): Set<string> {
+  return new Set(
+    this.hiddenColumns
+      .split(',')
+      .map(c => c.trim())
+      .filter(Boolean)
+  );
+}
+
+private _visibleColumns(): string[] {
+  const hidden = this._hiddenSet();
+  return this.columns.filter(col => !hidden.has(col));
+}
+
   private _renderHeader() {
     return html`
       <thead>
         <tr>
-          ${this.columns.map((col) => {
+          ${this._visibleColumns().map((col) => {
             const sortable = this._isSortable(col);
 
             const indicator =
@@ -279,7 +297,7 @@ export class SmartDataTable extends LitElement {
         ${this._processedData.map(
           (row) => html`
             <tr>
-              ${this.columns.map((col) => html` <td>${this._renderCell(row[col])}</td> `)}
+              ${this._visibleColumns().map((col) => html` <td>${this._renderCell(row[col])}</td> `)}
             </tr>
           `,
         )}

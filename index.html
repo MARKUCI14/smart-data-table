@@ -13,9 +13,9 @@
 
 <body>
   <smart-data-table id="table" sortable="age,role" page-size="3" show-search="true"></smart-data-table>
-  <smart-data-table id="table2" page-size="2" show-search="true"></smart-data-table>
-  <smart-data-table api="https://jsonplaceholder.typicode.com/users" page-size="5"
-    show-search="true"></smart-data-table>
+  <smart-data-table id="table2" page-size="2"></smart-data-table>
+  <smart-data-table api="https://jsonplaceholder.typicode.com/users" page-size="5" show-search="true"
+    hidden-columns="company,id"></smart-data-table>
 
   <script type="module">
     const table = document.querySelector('#table');
