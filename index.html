@@ -9,15 +9,6 @@
 
   <link rel="stylesheet" href="./src/index.css" />
   <script type="module" src="/src/smart-data-table.ts"></script>
-</head>
-
-<body>
-  <smart-data-table id="table" sortable="age,role" page-size="3" show-search="true" ,
-    export-csv="true"></smart-data-table>
-  <smart-data-table id="table2" page-size="2"></smart-data-table>
-  <smart-data-table api="https://jsonplaceholder.typicode.com/users" page-size="5" show-search="true"
-    hidden-columns="company,id" export-csv="true"></smart-data-table>
-
   <script type="module">
     const table = document.querySelector('#table');
 
@@ -46,6 +37,67 @@
     table2.data = data2;
     table2.title = 'Players';
   </script>
-</body>
+</head>
 
-</html>
+<body>
+  <div class="page">
+    <section class="hero">
+      <h1>Smart Data Table</h1>
+
+      <p>
+        A lightweight Lit-based Web Component with sorting,
+        pagination, search, CSV export and API support.
+      </p>
+
+      <div class="badges">
+        <div class="badge">Lit</div>
+        <div class="badge">Web Components</div>
+        <div class="badge">TypeScript</div>
+        <div class="badge">Framework Agnostic</div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <h2>Employee Directory</h2>
+          <p>
+            Demonstrates sorting, searching, pagination and CSV export.
+          </p>
+        </div>
+
+        <smart-data-table id="table" sortable="age,role" page-size="3" show-search="true" export-csv="true">
+        </smart-data-table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Football Players</h2>
+          <p>
+            Static dataset rendered through the component.
+          </p>
+        </div>
+
+        <smart-data-table id="table2" page-size="2">
+        </smart-data-table>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Remote API Example</h2>
+          <p>
+            Data loaded from JSONPlaceholder.
+          </p>
+        </div>
+
+        <smart-data-table api="https://jsonplaceholder.typicode.com/users" page-size="5" show-search="true"
+          hidden-columns="company,id" export-csv="true">
+        </smart-data-table>
+      </div>
+    </div>
+
+    <div class="footer">
+      Built with Lit • Smart Data Table v1.0
+    </div>
+  </div>
+</body>
