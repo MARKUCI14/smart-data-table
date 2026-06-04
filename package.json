@@ -1,0 +1,22 @@
+{
+  "name": "smart-data-table",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "axios": "^1.16.1",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.0.12"
+  }
+}

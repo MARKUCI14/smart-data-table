@@ -1,0 +1,4 @@
+*.yml
+*.yaml
+dist/
+node_modules/
